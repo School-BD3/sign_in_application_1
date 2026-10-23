@@ -8,6 +8,14 @@ import 'edit_profile_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  void _logout(BuildContext context) {
+    // Спочатку скидаємо дані профілю.
+    context.read<ProfileModel>().resetProfile();
+
+    // Потім завершуємо авторизацію.
+    context.read<AuthModel>().logout();
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint('HomeScreen build');
@@ -20,20 +28,19 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             tooltip: 'Вийти',
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthModel>().logout();
-              context.read<ProfileModel>().resetProfile();
-            },
+            onPressed: () => _logout(context),
           ),
         ],
       ),
       body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 400,
+            ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Icon(
@@ -41,15 +48,20 @@ class HomeScreen extends StatelessWidget {
                   size: 100,
                   color: Colors.blue,
                 ),
+
                 const SizedBox(height: 24),
 
-                
+                // Оптимізоване відображення даних профілю.
                 Column(
                   children: [
+                    // Selector перебудовує лише ім'я.
                     Selector<ProfileModel, String>(
-                      selector: (context, profile) => profile.name,
+                      selector: (context, profile) =>
+                          profile.name,
                       builder: (context, name, child) {
-                        debugPrint('ProfileName Selector build');
+                        debugPrint(
+                          'ProfileName Selector build',
+                        );
 
                         return Text(
                           'Вітаємо, $name!',
@@ -64,10 +76,14 @@ class HomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
+                    // Selector перебудовує лише email.
                     Selector<ProfileModel, String>(
-                      selector: (context, profile) => profile.email,
+                      selector: (context, profile) =>
+                          profile.email,
                       builder: (context, email, child) {
-                        debugPrint('ProfileEmail Selector build');
+                        debugPrint(
+                          'ProfileEmail Selector build',
+                        );
 
                         return Text(
                           email,
@@ -82,9 +98,14 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
 
+                const SizedBox(height: 24),
+
+                // Consumer відображає стан авторизації.
+                const AuthStatusWidget(),
 
                 const SizedBox(height: 32),
 
+                // Перехід до редагування профілю.
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
@@ -96,16 +117,16 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.edit),
-                  label: const Text('Редагувати профіль'),
+                  label: const Text(
+                    'Редагувати профіль',
+                  ),
                 ),
 
                 const SizedBox(height: 16),
 
+                // Вихід із застосунку.
                 OutlinedButton.icon(
-                  onPressed: () {
-                    context.read<AuthModel>().logout();
-                    context.read<ProfileModel>().resetProfile();
-                  },
+                  onPressed: () => _logout(context),
                   icon: const Icon(Icons.logout),
                   label: const Text('Вийти'),
                 ),
@@ -114,6 +135,54 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// Окремий віджет для демонстрації Consumer.
+class AuthStatusWidget extends StatelessWidget {
+  const AuthStatusWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthModel>(
+      builder: (context, auth, child) {
+        debugPrint('AuthStatus Consumer build');
+
+        final isAuthenticated = auth.isAuthenticated;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isAuthenticated
+                  ? Icons.check_circle
+                  : Icons.cancel,
+              color: isAuthenticated
+                  ? Colors.green
+                  : Colors.red,
+              size: 20,
+            ),
+
+            const SizedBox(width: 8),
+
+            Flexible(
+              child: Text(
+                isAuthenticated
+                    ? 'Користувач авторизований'
+                    : 'Користувач не авторизований',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isAuthenticated
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
