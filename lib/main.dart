@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'screens/login_screen.dart';
 
 import 'models/auth_model.dart';
 import 'models/profile_model.dart';
@@ -34,14 +35,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text(
-            'Provider налаштовано успішно!',
-            style: TextStyle(fontSize: 22),
-          ),
-        ),
-      ),
+      home: const LoginScreen(),
     );
   }
 }
