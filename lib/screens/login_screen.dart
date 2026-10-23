@@ -141,18 +141,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  Consumer<AuthModel>(
-                    builder: (context, auth, child) {
-                      debugPrint('LoginButton Consumer build');
+                  
+                  Selector<AuthModel, bool>(
+                    selector: (context, auth) => auth.isLoading,
+                    builder: (context, isLoading, child) {
+                      debugPrint('LoginButton Selector build');
 
                       return ElevatedButton(
-                        onPressed: auth.isLoading
-                            ? null
-                            : _login,
+                        onPressed: isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(16),
                         ),
-                        child: auth.isLoading
+                        child: isLoading
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
@@ -165,21 +165,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
 
+
                   const SizedBox(height: 16),
 
-                  Consumer<AuthModel>(
-                    builder: (context, auth, child) {
-                      debugPrint('LoginError Consumer build');
+                  
+                  Selector<AuthModel, String?>(
+                    selector: (context, auth) {
+                      if (auth.status == AuthStatus.error) {
+                        return auth.errorMessage;
+                      }
 
-                      if (auth.status != AuthStatus.error) {
+                      return null;
+                    },
+                    builder: (context, errorMessage, child) {
+                      debugPrint('LoginError Selector build');
+
+                      if (errorMessage == null) {
                         return const SizedBox.shrink();
                       }
 
                       return Column(
                         children: [
                           Text(
-                            auth.errorMessage ??
-                                'Невідома помилка',
+                            errorMessage,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.red,
@@ -189,15 +197,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 8),
 
                           TextButton(
-                            onPressed: auth.isLoading
-                                ? null
-                                : _login,
+                            onPressed: _login,
                             child: const Text('Повторити'),
                           ),
                         ],
                       );
                     },
                   ),
+
                 ],
               ),
             ),

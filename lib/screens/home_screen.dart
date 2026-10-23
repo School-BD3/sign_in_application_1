@@ -43,33 +43,45 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                Consumer<ProfileModel>(
-                  builder: (context, profile, child) {
-                    debugPrint('ProfileInfo Consumer build');
+                
+                Column(
+                  children: [
+                    Selector<ProfileModel, String>(
+                      selector: (context, profile) => profile.name,
+                      builder: (context, name, child) {
+                        debugPrint('ProfileName Selector build');
 
-                    return Column(
-                      children: [
-                        Text(
-                          'Вітаємо, ${profile.name}!',
+                        return Text(
+                          'Вітаємо, $name!',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          profile.email,
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Selector<ProfileModel, String>(
+                      selector: (context, profile) => profile.email,
+                      builder: (context, email, child) {
+                        debugPrint('ProfileEmail Selector build');
+
+                        return Text(
+                          email,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ],
                 ),
+
 
                 const SizedBox(height: 32),
 
