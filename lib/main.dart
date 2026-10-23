@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/login_screen.dart';
 
 import 'models/auth_model.dart';
 import 'models/profile_model.dart';
+
+import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(
@@ -35,7 +37,27 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('AuthWrapper build');
+
+    final isAuthenticated =
+        context.select<AuthModel, bool>(
+          (auth) => auth.isAuthenticated,
+        );
+
+    if (isAuthenticated) {
+      return const HomeScreen();
+    }
+
+    return const LoginScreen();
   }
 }
